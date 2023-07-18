@@ -1,0 +1,15 @@
+#git
+From alpine/git as repo
+MAINTAINER Sdg samuel_okuneye@yahoo.com
+WORKDIR /home/${USER}/
+RUN git clone https://github.com/samuelokuneye/maven-enterprise-application
+
+#maven build
+FROM maven:3.9.1-eclipse-temurin-8-alpine as build
+WORKDIR /home/${USER}/
+COPY --from=repo /home/${USER}/maven-enterprise-application /home/${USER}/mea
+RUN cd /home/${USER}/mea && mvn install 
+
+#jboss/wildfly
+FROM jboss/wildfly
+COPY --from=build /home/${USER}/mea/MavenEnterpriseApp-ear/target/MavenEnterpriseApp-ear.ear /opt/jboss/wildfly/standalone/deployments/
